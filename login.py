@@ -3,7 +3,6 @@ import tkinter as tk
 
 import numpy as np
 import pandas as pd
-from pymongo import MongoClient
 
 from inventory_management_system import InventoryMangement
 
@@ -11,12 +10,9 @@ from inventory_management_system import InventoryMangement
 class LoginPage:
     def __init__(self, root):
         self.login_result = False
-        self.root = root
-        self.invn = InventoryMangement(self.root)
+        self.parent_root = root
+        self.invn = InventoryMangement(self.parent_root)
         self.user_info_path = "Data/user_info.csv"
-
-    def exit_tk(self):
-        self.root.destroy()
 
     def detail_check(self, username_entry, password_entry, result_label):
         user_info = pd.read_csv(self.user_info_path)
@@ -30,7 +26,7 @@ class LoginPage:
             user_identification.shape[0] != 0
             and entered_password == user_identification["Password"].iloc[0]
         ):
-            root = tk.Toplevel(self.root)
+            root = tk.Toplevel()
             add_button = tk.Button(
                 root,
                 text="Add Book",
@@ -47,14 +43,16 @@ class LoginPage:
             )
             retrive_button.pack(pady=10, anchor="w", padx=10)
 
-            close_button = tk.Button(root, text="Exit", command=self.exit_tk, width=15)
+            close_button = tk.Button(root, text="Exit", command=root.destroy, width=15)
             close_button.pack(pady=10, anchor="w", padx=10)
+            self.root.destroy()
         else:
             result_label.config(text="Login Failed")
-            self.root.after(5000, lambda: result_label.config(text=""))
+            self.root.after(3000, lambda: result_label.config(text=""))
+            self.root.destroy()
 
     def login_(self):
-
+        self.root = tk.Toplevel(self.parent_root)
         username_label = tk.Label(self.root, text="Username:")
         username_label.pack()
 
@@ -89,7 +87,7 @@ class LoginPage:
         user_df = pd.DataFrame([data])
         user_df.to_csv(self.user_info_path, mode="a", header=False, index=False)
 
-        self.child_root.destroy()  # Close the registration window after saving data
+        self.child_root.destroy() 
 
     def user_registration(self):
 

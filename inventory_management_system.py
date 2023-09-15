@@ -4,8 +4,6 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-import pymongo
-from pymongo import MongoClient
 
 
 class InventoryMangement:
@@ -67,27 +65,6 @@ class InventoryMangement:
         print_button.pack()
 
         self.root.mainloop()
-
-    # def add_book(self):
-    #     if self.book_info_dir in os.listdir("Data/"):
-    #         df = pd.read_csv(self.book_info_dir)
-    #     else:
-    #         df = pd.DataFrame()
-
-    #     self.root = tk.Toplevel(self.parent_root)
-    #     self.root.title("Adding Book")
-
-    #     def add_and_close(df):
-    #         self.get_data()
-    #         df_concat = df.append(self.book_info_df, ignore_index=True)
-    #         if os.path.isfile(self.book_info_dir):
-    #             df_concat.to_csv(
-    #                 self.book_info_dir, mode="a", index=False, header=False
-    #             )
-    #         else:
-    #             df_concat.to_csv(self.book_info_dir, index=False)
-
-    #     add_and_close(df)
 
     def retrieve_books(self):
         def cll_info():

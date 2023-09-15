@@ -1,7 +1,6 @@
 import tkinter as tk
 
 from PIL import Image, ImageTk
-from pymongo import MongoClient
 
 from inventory_management_system import InventoryMangement
 from login import LoginPage
