@@ -4,3 +4,4 @@ os
 tkinter
 datetime
 pillow
+sklearn

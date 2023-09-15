@@ -27,6 +27,8 @@ class LoginPage:
             and entered_password == user_identification["Password"].iloc[0]
         ):
             root = tk.Toplevel()
+            user_name = tk.Label(root, text=f"Welcome {user_identification['Name'].values[0]}",fg="purple", font=("Comic Sans MS", 29, "bold"))
+            user_name.pack()
             add_button = tk.Button(
                 root,
                 text="Add Book",
