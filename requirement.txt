@@ -1,0 +1,6 @@
+pandas
+numpy
+os
+tkinter
+datetime
+pillow
