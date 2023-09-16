@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from datetime import datetime
 from tkinter import ttk
-
+import webbrowser
 import numpy as np
 import pandas as pd
 
@@ -66,6 +66,12 @@ class InventoryMangement:
         self.root.mainloop()
 
     def retrieve_books(self, book_list_frame, retrive_button, lower_frame):
+        def open_link(event):
+            item = book_tree.selection()[0]  
+            link = book_tree.item(item, "values")[5]
+            if link.startswith("https://") or link.startswith("http://"):
+                webbrowser.open(link)
+
         def update_book_list():
             for i in book_tree.get_children():
                 book_tree.delete(i)
@@ -78,23 +84,17 @@ class InventoryMangement:
             for book in ls:
                 book_tree.insert("", "end", values=book)
 
-        columns = ("Book Name", "Author", "Genre", "Date", "Time")
+        columns = ("Book Name", "Description", "Authors", "Genres", "Date", "Link")
         book_tree = ttk.Treeview(
-            book_list_frame, columns=columns, show="headings", height=15
+            book_list_frame, columns=columns, show="headings", height=17
         )
+        book_tree.bind("<Double-1>", open_link)
         for col in columns:
             book_tree.heading(col, text=col)
-            book_tree.column(col, width=155)
-
+            if col == "Book Name" or col == "Link" or col == "Description":
+                book_tree.column(col, width=210)
+            else:
+                book_tree.column(col, width=113)
         book_tree.pack(fill="both", expand=True)
         update_book_list()
-        retrive_button.destroy()
-
-        refresh_button = tk.Button(
-            lower_frame,
-            text="Refresh List",
-            command=update_book_list,
-            width=15,
-            height=2,
-        )
-        refresh_button.pack(pady=10, side="left", padx=10)
+        retrive_button.config(text="Refresh list", command=update_book_list)

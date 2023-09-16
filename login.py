@@ -38,10 +38,10 @@ class LoginPage:
                 lower_frame,
                 text="Add Book",
                 command=lambda: self.invn.add_book(),
-                width=15,
-                height=2,
+                width=10,
+                height=1
             )
-            add_button.pack(pady=10, side="left", padx=10)
+            add_button.pack(pady=5, padx=5, anchor='w')
 
             retrive_button = tk.Button(
                 lower_frame,
@@ -49,26 +49,26 @@ class LoginPage:
                 command=lambda: self.invn.retrieve_books(
                     book_list_frame, retrive_button, lower_frame
                 ),
-                width=15,
-                height=2,
+                width=10,
+                height=1
             )
-            retrive_button.pack(pady=10, side="left", padx=10)
+            retrive_button.pack(pady=5, padx=5, anchor='w')
 
             close_button = tk.Button(
                 lower_frame,
                 text="Exit",
                 command=self.parent_root.destroy,
-                width=15,
-                height=2,
+                width=10,
+                height=1
             )
-            close_button.pack(pady=10, side="left", padx=10)
+            close_button.pack(pady=5, padx=5, anchor='w')
 
             self.clear_frame(login_frame)
 
             login_label = tk.Label(
                 login_frame,
                 text="Hello",
-                width=25,
+                width=28,
                 height=2,
             )
             login_label.pack()
