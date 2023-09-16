@@ -25,6 +25,8 @@ login_frame.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
 # Bottom Left Box
 lower_left = tk.Frame(root, width=200, height=200, bg="white")
 lower_left.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+lower_left.pack_propagate(False)
+
 
 # Bottom Right Box
 lower_right = tk.Frame(root, width=200, height=200, bg="gray")
@@ -38,7 +40,7 @@ login_button = tk.Button(
     width=28,
     height=2,
     text="Login",
-    command=lambda: lg.login_(login_frame, lower_right, book_list_frame),
+    command=lambda: lg.login_(login_frame, lower_right, book_list_frame, lower_left),
 )
 login_button.pack(padx=2, pady=5, anchor="center")
 

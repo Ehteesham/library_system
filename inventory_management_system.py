@@ -1,8 +1,9 @@
 import os
 import tkinter as tk
-from datetime import datetime
-from tkinter import ttk
 import webbrowser
+from datetime import datetime
+from tkinter import font, ttk
+
 import numpy as np
 import pandas as pd
 
@@ -65,12 +66,52 @@ class InventoryMangement:
 
         self.root.mainloop()
 
-    def retrieve_books(self, book_list_frame, retrive_button, lower_frame):
+    def retrieve_books(self, book_list_frame, retrive_button, lower_frame, lower_left):
         def open_link(event):
-            item = book_tree.selection()[0]  
+            item = book_tree.selection()[0]
             link = book_tree.item(item, "values")[5]
             if link.startswith("https://") or link.startswith("http://"):
                 webbrowser.open(link)
+
+        def limit_text(text, max_chars):
+            if len(text) > max_chars:
+                return text[:max_chars]
+            else:
+                return text
+
+        def view_details(text, bold_font):
+            name_item = book_tree.selection()[0]
+            name_value = book_tree.item(name_item, "values")[0]
+            text.delete(1.0, "end")
+            text.tag_configure("bold", font=bold_font)
+            text.insert("1.0", "Book Name - ", "bold")
+            text.insert("1.13", f"{name_value}\n", "normal")
+
+            description_item = book_tree.selection()[0]
+            description_value = book_tree.item(description_item, "values")[1]
+            limited_text = limit_text(description_value, 850)
+            text.insert("2.0", "Description - ", "bold")
+            text.insert("2.15", f"{description_value}\n", "normal")
+
+            author_item = book_tree.selection()[0]
+            author_value = book_tree.item(author_item, "values")[2]
+            text.insert("3.0", "Author - ", "bold")
+            text.insert("3.10", f"{author_value}\n", "normal")
+
+            genre_item = book_tree.selection()[0]
+            genre_value = book_tree.item(genre_item, "values")[3]
+            text.insert("4.0", "Genre - ", "bold")
+            text.insert("4.8", f"{genre_value}\n", "normal")
+
+            date_item = book_tree.selection()[0]
+            date_value = book_tree.item(date_item, "values")[4]
+            text.insert("5.0", "Published Date - ", "bold")
+            text.insert("5.17", f"{date_value}\n", "normal")
+
+            link_item = book_tree.selection()[0]
+            link_value = book_tree.item(link_item, "values")[5]
+            text.insert("6.0", "Link - ", "bold")
+            text.insert("6.8", f"{link_value}\n", "normal")
 
         def update_book_list():
             for i in book_tree.get_children():
@@ -88,7 +129,19 @@ class InventoryMangement:
         book_tree = ttk.Treeview(
             book_list_frame, columns=columns, show="headings", height=17
         )
+
+        text = tk.Text(lower_left, wrap="word", bg="white", font=("Arial", 12))
+        text.pack(fill="both", expand=True)
+
+        bold_font = font.Font(text, text.cget("font"))
+        bold_font.configure(weight="bold")
+
         book_tree.bind("<Double-1>", open_link)
+        book_tree.bind(
+            "<ButtonRelease-1>",
+            lambda event, text=text, bold_font=bold_font: view_details(text, bold_font),
+        )
+
         for col in columns:
             book_tree.heading(col, text=col)
             if col == "Book Name" or col == "Link" or col == "Description":
