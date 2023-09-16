@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from datetime import datetime
+from tkinter import ttk
 
 import numpy as np
 import pandas as pd
@@ -14,10 +15,6 @@ class InventoryMangement:
         self.book_info_df = None
 
     def add_book(self):
-
-        self.root = tk.Toplevel(self.parent_root)
-        self.root.title("Adding Book")
-
         def register_text():
             selected_option = option_var.get()
             entered_text1 = entry1.get()
@@ -33,12 +30,15 @@ class InventoryMangement:
             }
             self.book_info_df = pd.DataFrame([self.book_info])
             if os.path.isfile(self.book_info_dir):
-                self.book_info_df.to_csv(
-                    self.book_info_dir, mode="a", index=False, header=False
-                )
+                saved_df = pd.read_csv(self.book_info_dir)
+                merged_df = pd.concat([saved_df, self.book_info_df], ignore_index=True)
+                merged_df.to_csv(self.book_info_dir, index=False)
             else:
                 self.book_info_df.to_csv(self.book_info_dir, index=False)
             self.root.destroy()
+
+        self.root = tk.Toplevel(self.parent_root)
+        self.root.title("Adding Book")
 
         label1 = tk.Label(self.root, text="Enter Book Name: ")
         label1.pack()
@@ -65,64 +65,36 @@ class InventoryMangement:
 
         self.root.mainloop()
 
-    def retrieve_books(self):
-        def cll_info():
+    def retrieve_books(self, book_list_frame, retrive_button, lower_frame):
+        def update_book_list():
+            for i in book_tree.get_children():
+                book_tree.delete(i)
+
+            book_df = pd.read_csv(self.book_info_dir, sep=",")
             ls = []
+            for rows in range(book_df.shape[0]):
+                ls.append(tuple(book_df.iloc[rows]))
 
-            db = client.library_mang_sys
-            infor = db.inventory_management
-            num_rows = infor.count_documents({})
-            dc_data = list(infor.find({}, projection={"_id": False}))
-            ls.append(list(dc_data[0].keys()))
+            for book in ls:
+                book_tree.insert("", "end", values=book)
 
-            for i in range(num_rows):
-                dc_value = list(dc_data[i].values())
-                ls.append(dc_value)
+        columns = ("Book Name", "Author", "Genre", "Date", "Time")
+        book_tree = ttk.Treeview(
+            book_list_frame, columns=columns, show="headings", height=15
+        )
+        for col in columns:
+            book_tree.heading(col, text=col)
+            book_tree.column(col, width=155)
 
-            num_cols = len(dc_data[0])
+        book_tree.pack(fill="both", expand=True)
+        update_book_list()
+        retrive_button.destroy()
 
-            recent_book = self.book_info
-            if recent_book == None:
-                return ls, num_rows, num_cols
-
-            ls.append(list(recent_book.values()))
-            return ls, num_rows + 1, num_cols
-
-        def create_table():
-            try:
-                df = pd.read_csv(self.book_info_dir)
-                num_rows, num_cols = df.shape[0], df.shape[1]
-                data = np.vstack([df.columns.tolist(), df.values])
-            except FileNotFoundError:
-                if isinstance(self.book_info_df, pd.core.frame.DataFrame):
-                    column_names = self.book_info_df.columns.tolist()
-                    data_values = self.book_info_df.values
-                    data = np.vstack([column_names, data_values])
-                    num_rows, num_cols = (
-                        self.book_info_df.shape[0],
-                        self.book_info_df.shape[1],
-                    )
-                else:
-                    result_label = tk.Label(self.root, text="No Books are Available")
-                    result_label.pack()
-                    return
-
-            for i in range(num_rows + 1):
-                for j in range(num_cols):
-                    cell_value = data[i][j]
-                    cell_label = tk.Label(
-                        self.root,
-                        text=cell_value,
-                        width=23,
-                        height=2,
-                        relief="solid",
-                        font=("Comic Sans MS", 11, "bold"),
-                    )
-                    cell_label.grid(row=i, column=j)
-
-        self.root = tk.Toplevel(self.parent_root)
-        # self.root.geometry("700x350")
-        self.root.title("List of Books")
-        if not cll_info:
-            print("Library is Empty!!!!")
-        create_table()
+        refresh_button = tk.Button(
+            lower_frame,
+            text="Refresh List",
+            command=update_book_list,
+            width=15,
+            height=2,
+        )
+        refresh_button.pack(pady=10, side="left", padx=10)

@@ -14,7 +14,15 @@ class LoginPage:
         self.invn = InventoryMangement(self.parent_root)
         self.user_info_path = "Data/user_info.csv"
 
-    def detail_check(self, username_entry, password_entry, result_label, lower_frame):
+    def detail_check(
+        self,
+        username_entry,
+        password_entry,
+        result_label,
+        lower_frame,
+        login_frame,
+        book_list_frame,
+    ):
         user_info = pd.read_csv(self.user_info_path)
 
         entered_username = username_entry.get()
@@ -31,19 +39,39 @@ class LoginPage:
                 text="Add Book",
                 command=lambda: self.invn.add_book(),
                 width=15,
+                height=2,
             )
             add_button.pack(pady=10, side="left", padx=10)
 
             retrive_button = tk.Button(
                 lower_frame,
                 text="Show Books",
-                command=lambda: self.invn.retrieve_books(),
+                command=lambda: self.invn.retrieve_books(
+                    book_list_frame, retrive_button, lower_frame
+                ),
                 width=15,
+                height=2,
             )
-            retrive_button.pack(pady=10,side="left", padx=10)
+            retrive_button.pack(pady=10, side="left", padx=10)
 
-            close_button = tk.Button(lower_frame, text="Exit", command=self.parent_root.destroy, width=15)
-            close_button.pack(pady=10, side="left",padx=10)
+            close_button = tk.Button(
+                lower_frame,
+                text="Exit",
+                command=self.parent_root.destroy,
+                width=15,
+                height=2,
+            )
+            close_button.pack(pady=10, side="left", padx=10)
+
+            self.clear_frame(login_frame)
+
+            login_label = tk.Label(
+                login_frame,
+                text="Hello",
+                width=25,
+                height=2,
+            )
+            login_label.pack()
 
             self.root.destroy()
         else:
@@ -51,12 +79,11 @@ class LoginPage:
             self.root.after(3000, lambda: result_label.config(text=""))
             self.root.destroy()
 
-    def login_(self, login_frame, lower_frame):
-        def clear_frame(frame):
-            for widget in frame.winfo_children():
-                widget.destroy()
+    def clear_frame(self, frame):
+        for widget in frame.winfo_children():
+            widget.destroy()
 
-        clear_frame(login_frame)
+    def login_(self, login_frame, lower_frame, book_list_frame):
         self.root = tk.Toplevel(self.parent_root)
         username_label = tk.Label(self.root, text="Username:")
         username_label.pack()
@@ -74,7 +101,12 @@ class LoginPage:
             self.root,
             text="Login",
             command=lambda: self.detail_check(
-                username_entry, password_entry, result_label, lower_frame
+                username_entry,
+                password_entry,
+                result_label,
+                lower_frame,
+                login_frame,
+                book_list_frame,
             ),
         )
         login_button.pack()
@@ -84,7 +116,6 @@ class LoginPage:
 
     def add_data(self, name, username, password):
         if not os.path.exists(self.user_info_path):
-            # Create a new CSV file with a header row if it doesn't exist
             df = pd.DataFrame(columns=["Name", "Username", "Password"])
             df.to_csv(self.user_info_path, index=False)
 
@@ -94,9 +125,8 @@ class LoginPage:
 
         self.child_root.destroy()
 
-    def user_registration(self):
-
-        self.child_root = tk.Toplevel(self.root)
+    def user_registration(self, login_frame):
+        self.child_root = tk.Toplevel(self.parent_root)
         self.child_root.title("Registration Page")
 
         label1 = tk.Label(self.child_root, text="Enter Your Name: ")

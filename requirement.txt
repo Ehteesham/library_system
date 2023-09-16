@@ -5,3 +5,5 @@ tkinter
 datetime
 pillow
 sklearn
+notebook
+difflib
