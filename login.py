@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-
+from tkinter import font
 import numpy as np
 import pandas as pd
 
@@ -35,6 +35,7 @@ class LoginPage:
             user_identification.shape[0] != 0
             and entered_password == user_identification["Password"].iloc[0]
         ):
+            self.clear_frame(lower_frame)
             add_button = tk.Button(
                 lower_frame,
                 text="Add Book",
@@ -77,32 +78,31 @@ class LoginPage:
             )
             login_label.pack()
 
-            self.root.destroy()
         else:
             result_label.config(text="Login Failed")
-            self.root.after(3000, lambda: result_label.config(text=""))
-            self.root.destroy()
+            lower_frame.after(3000, lambda: result_label.config(text=""))
 
     def clear_frame(self, frame):
         for widget in frame.winfo_children():
             widget.destroy()
 
     def login_(self, login_frame, lower_frame, book_list_frame, lower_left):
-        self.root = tk.Toplevel(self.parent_root)
-        username_label = tk.Label(self.root, text="Username:")
+        bold_font = font.Font(family="Arial", size=12, weight="bold")
+        light_font = font.Font(family="Arial", size=10, weight="normal")
+        username_label = tk.Label(lower_frame, text="Username", bg='white', font=bold_font)
         username_label.pack()
 
-        username_entry = tk.Entry(self.root)
+        username_entry = tk.Entry(lower_frame, font=light_font)
         username_entry.pack()
 
-        password_label = tk.Label(self.root, text="Password:")
+        password_label = tk.Label(lower_frame, text="Password", bg='white', font=bold_font)
         password_label.pack()
 
-        password_entry = tk.Entry(self.root, show="*")
+        password_entry = tk.Entry(lower_frame, show="*")
         password_entry.pack()
 
         login_button = tk.Button(
-            self.root,
+            lower_frame,
             text="Login",
             command=lambda: self.detail_check(
                 username_entry,
@@ -113,10 +113,12 @@ class LoginPage:
                 book_list_frame,
                 lower_left,
             ),
+            width=15,
+            pady=5
         )
-        login_button.pack()
+        login_button.pack(pady=10)
 
-        result_label = tk.Label(self.root, text="")
+        result_label = tk.Label(lower_frame, text="", bg='white')
         result_label.pack()
 
     def add_data(self, name, username, password):
