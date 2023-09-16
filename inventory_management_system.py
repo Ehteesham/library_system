@@ -31,7 +31,6 @@ class InventoryMangement:
                 "Date": date,
                 "Time": time,
             }
-            print(self.book_info)
             self.book_info_df = pd.DataFrame([self.book_info])
             if os.path.isfile(self.book_info_dir):
                 self.book_info_df.to_csv(

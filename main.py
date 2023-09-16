@@ -25,6 +25,13 @@ if __name__ == "__main__":
     image_label = tk.Label(root, image=image_tk)
     image_label.pack()
 
+    # Top Left box
+    book_list_frame = tk.Frame(root, width=400, height=200, bg="lightgray")
+    book_list_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+
+    canvas = tk.Canvas(book_list_frame, bg="white")
+    canvas.pack(fill="both", expand=True)
+
     label_text = "Library Management System"
     label = tk.Label(
         root, text=label_text, fg="purple", font=("Comic Sans MS", 29, "bold")
