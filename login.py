@@ -28,9 +28,7 @@ class LoginPage:
 
         entered_username = username_entry.get()
         entered_password = password_entry.get()
-
         user_identification = user_info[user_info["Username"] == entered_username]
-
         if (
             user_identification.shape[0] != 0
             and entered_password == user_identification["Password"].iloc[0]
@@ -147,8 +145,10 @@ class LoginPage:
             df.to_csv(self.user_info_path, index=False)
 
         data = {"Name": name, "Username": username, "Password": password}
+        saved_df = pd.read_csv(self.user_info_path)
         user_df = pd.DataFrame([data])
-        user_df.to_csv(self.user_info_path, mode="a", header=False, index=False)
+        merged_df = pd.concat([saved_df, user_df], ignore_index=True)
+        merged_df.to_csv(self.user_info_path, index=False)
 
         self.child_root.destroy()
 

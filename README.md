@@ -34,4 +34,4 @@ This project does not use a traditional database system. Instead, it stores all 
 
 ## License
 
-This project is open-source and available under the [MIT License](https://www.mit.edu/~amini/LICENSE.md).
+This project is open-source and available under the [MIT License](https://www.mit.edu/~amini/LICENSE.md)

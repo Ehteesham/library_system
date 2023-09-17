@@ -26,12 +26,16 @@ class InventoryMangement:
             selected_option = option_var.get()
             entered_text1 = entry1.get()
             entered_text2 = entry2.get()
+            entered_text3 = entry3.get()
+            entered_text4 = entry4.get()
             date = datetime.now().strftime("%Y %m %d")
             time = datetime.now().strftime("%I:%M:%S %p")
             self.book_info = {
                 "Book Name": entered_text1,
+                "Description": entered_text3,
                 "Author Name": entered_text2,
                 "Genre": selected_option,
+                "Link": entered_text4,
                 "Date": date,
                 "Time": time,
             }
@@ -47,17 +51,29 @@ class InventoryMangement:
         self.root = tk.Toplevel(self.parent_root)
         self.root.title("Adding Book")
 
-        label1 = tk.Label(self.root, text="Enter Book Name: ")
+        label1 = tk.Label(self.root, text="Book Name: ")
         label1.pack()
 
         entry1 = tk.Entry(self.root)
         entry1.pack()
 
-        label2 = tk.Label(self.root, text="Enter Author Name: ")
+        label3 = tk.Label(self.root, text="Description: ")
+        label3.pack()
+
+        entry3 = tk.Entry(self.root)
+        entry3.pack()
+
+        label2 = tk.Label(self.root, text="Author Name: ")
         label2.pack()
 
         entry2 = tk.Entry(self.root)
         entry2.pack()
+
+        label4 = tk.Label(self.root, text="Link: ")
+        label4.pack()
+
+        entry4 = tk.Entry(self.root)
+        entry4.pack()
 
         option_var = tk.StringVar()
         option_var.set("None")
