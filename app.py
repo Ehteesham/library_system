@@ -5,7 +5,6 @@ from login import LoginPage
 
 # Initializing an object
 root = tk.Tk()
-lg = LoginPage(root)
 
 # Adjusting tkinter window
 root.title("Library Management System")
@@ -33,6 +32,7 @@ lower_right = tk.Frame(root, width=200, height=200, bg="white")
 lower_right.grid(row=1, column=1, columnspan=2, padx=5, pady=5, sticky="nsew")
 
 # Top Right Buttons
+lg = LoginPage(root, book_list_frame)
 
 # Login Button
 login_button = tk.Button(
@@ -40,7 +40,7 @@ login_button = tk.Button(
     width=28,
     height=2,
     text="Login",
-    command=lambda: lg.login_(login_frame, lower_right, book_list_frame, lower_left),
+    command=lambda: lg.login_(login_frame, lower_right, lower_left),
 )
 login_button.pack(padx=2, pady=5, anchor="center")
 

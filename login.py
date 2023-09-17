@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import font
+
 import numpy as np
 import pandas as pd
 
@@ -8,10 +9,10 @@ from inventory_management_system import InventoryMangement
 
 
 class LoginPage:
-    def __init__(self, root):
+    def __init__(self, root, book_list_frame):
         self.login_result = False
         self.parent_root = root
-        self.invn = InventoryMangement(self.parent_root)
+        self.invn = InventoryMangement(self.parent_root, book_list_frame)
         self.user_info_path = "Data/user_info.csv"
 
     def detail_check(
@@ -21,7 +22,6 @@ class LoginPage:
         result_label,
         lower_frame,
         login_frame,
-        book_list_frame,
         lower_left,
     ):
         user_info = pd.read_csv(self.user_info_path)
@@ -42,22 +42,23 @@ class LoginPage:
                 command=lambda: self.invn.add_book(),
                 width=10,
                 height=1,
+                padx=5,
+                pady=5,
             )
-            add_button.pack(pady=5, padx=5, anchor="w")
 
             retrive_button = tk.Button(
                 lower_frame,
                 text="Show Books",
                 command=lambda: self.invn.retrieve_books(
-                    book_list_frame,
                     retrive_button,
                     lower_frame,
                     lower_left,
                 ),
                 width=10,
                 height=1,
+                padx=5,
+                pady=5,
             )
-            retrive_button.pack(pady=5, padx=5, anchor="w")
 
             close_button = tk.Button(
                 lower_frame,
@@ -65,8 +66,24 @@ class LoginPage:
                 command=self.parent_root.destroy,
                 width=10,
                 height=1,
+                padx=5,
+                pady=5,
             )
-            close_button.pack(pady=5, padx=5, anchor="w")
+
+            search_button = tk.Button(
+                lower_frame,
+                text="Search",
+                command=self.invn.search,
+                width=10,
+                height=1,
+                padx=5,
+                pady=5,
+            )
+
+            add_button.grid(row=0, column=0, padx=5, pady=5)
+            retrive_button.grid(row=1, column=0, padx=5, pady=5)
+            close_button.grid(row=2, column=0, padx=5, pady=5)
+            search_button.grid(row=0, column=1, padx=5, pady=5)
 
             self.clear_frame(login_frame)
 
@@ -86,16 +103,20 @@ class LoginPage:
         for widget in frame.winfo_children():
             widget.destroy()
 
-    def login_(self, login_frame, lower_frame, book_list_frame, lower_left):
+    def login_(self, login_frame, lower_frame, lower_left):
         bold_font = font.Font(family="Arial", size=12, weight="bold")
         light_font = font.Font(family="Arial", size=10, weight="normal")
-        username_label = tk.Label(lower_frame, text="Username", bg='white', font=bold_font)
+        username_label = tk.Label(
+            lower_frame, text="Username", bg="white", font=bold_font
+        )
         username_label.pack()
 
         username_entry = tk.Entry(lower_frame, font=light_font)
         username_entry.pack()
 
-        password_label = tk.Label(lower_frame, text="Password", bg='white', font=bold_font)
+        password_label = tk.Label(
+            lower_frame, text="Password", bg="white", font=bold_font
+        )
         password_label.pack()
 
         password_entry = tk.Entry(lower_frame, show="*")
@@ -110,15 +131,14 @@ class LoginPage:
                 result_label,
                 lower_frame,
                 login_frame,
-                book_list_frame,
                 lower_left,
             ),
             width=15,
-            pady=5
+            pady=5,
         )
         login_button.pack(pady=10)
 
-        result_label = tk.Label(lower_frame, text="", bg='white')
+        result_label = tk.Label(lower_frame, text="", bg="white")
         result_label.pack()
 
     def add_data(self, name, username, password):
