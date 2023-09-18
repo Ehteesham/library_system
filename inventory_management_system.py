@@ -7,6 +7,7 @@ from tkinter import font, ttk
 import numpy as np
 import pandas as pd
 
+from qr_code_handle import QrCodeGenerator
 from search_system import SearchSystem
 
 
@@ -20,6 +21,7 @@ class InventoryMangement:
         self.book_tree = ttk.Treeview(
             book_list_frame, columns=self.columns, show="headings", height=17
         )
+        self.qr = QrCodeGenerator()
 
     def add_book(self):
         def register_text():
@@ -94,7 +96,7 @@ class InventoryMangement:
         sc = SearchSystem(self.parent_root, self.book_tree, self.columns)
         sc.view()
 
-    def retrieve_books(self, retrive_button, lower_frame, lower_left):
+    def retrieve_books(self, retrive_button, lower_frame, lower_left, login_frame):
         def open_link(event):
             item = self.book_tree.selection()[0]
             link = self.book_tree.item(item, "values")[5]
@@ -107,7 +109,19 @@ class InventoryMangement:
             else:
                 return text
 
+        def qrcodehandler(link):
+            df = pd.read_csv(self.book_info_dir, sep=",")
+            qr_code = df[df["Link"] == link].iloc[:, -1].values[0]
+            code = tk.BitmapImage(data=qr_code)
+            return code
+
+        def clear_frame(frame):
+            for widget in frame.winfo_children():
+                widget.destroy()
+
         def view_details(text, bold_font):
+            clear_frame(login_frame)
+
             text.config(state="normal")
             name_item = self.book_tree.selection()[0]
             name_value = self.book_tree.item(name_item, "values")[0]
@@ -143,23 +157,48 @@ class InventoryMangement:
             text.insert("6.8", f"{link_value}\n", "normal")
 
             text.config(state="disabled")
+            code = qrcodehandler(link_value)
+            custom_font = font.Font(family="Arial", size=14, weight="bold")
+            img_text_label = tk.Label(
+                login_frame,
+                text="Scan To Get Book",
+                wraplength=200,
+                font=custom_font,
+                bg="white",
+            )
+            img_text_label.pack()
+            img_label = tk.Label(login_frame, image=code, bg="white")
+            img_label.pack()
+            login_frame.mainloop()
 
-        def update_book_list():
-            self.book_tree.delete(*self.book_tree.get_children())
-            book_df = pd.read_csv(self.book_info_dir, sep=",")
-            ls = []
-            for rows in range(book_df.shape[0]):
-                ls.append(tuple(book_df.iloc[rows]))
+        def update_book_list(tx=None, states=False):
+            if states == True:
+                tx.config(state="normal")
+                tx.delete("1.0", "end")
+                self.book_tree.delete(*self.book_tree.get_children())
+                book_df = pd.read_csv(self.book_info_dir, sep=",")
+                ls = []
+                for rows in range(book_df.shape[0]):
+                    ls.append(tuple(book_df.iloc[rows]))
 
-            for book in ls:
-                self.book_tree.insert("", "end", values=book)
+                for book in ls:
+                    self.book_tree.insert("", "end", values=book)
+                self.qr.display_qr(login_frame, state=True)
+            else:
+                # self.book_tree.delete(*self.book_tree.get_children())
+                book_df = pd.read_csv(self.book_info_dir, sep=",")
+                ls = []
+                for rows in range(book_df.shape[0]):
+                    ls.append(tuple(book_df.iloc[rows]))
+
+                for book in ls:
+                    self.book_tree.insert("", "end", values=book)
 
         text = tk.Text(lower_left, wrap="word", bg="white", font=("Arial", 12))
         text.pack(fill="both", expand=True)
 
         bold_font = font.Font(text, text.cget("font"))
         bold_font.configure(weight="bold")
-
         self.book_tree.bind("<Double-1>", open_link)
         self.book_tree.bind(
             "<ButtonRelease-1>",
@@ -173,4 +212,6 @@ class InventoryMangement:
                 self.book_tree.column(col, width=113)
         self.book_tree.pack(fill="both", expand=True)
         update_book_list()
-        retrive_button.config(text="Refresh list", command=update_book_list)
+        retrive_button.config(
+            text="Refresh list", command=lambda: update_book_list(tx=text, states=True)
+        )

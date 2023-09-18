@@ -5,8 +5,8 @@ from tkinter import font
 import numpy as np
 import pandas as pd
 
-from qr_code_handle import QrCodeGenerator
 from inventory_management_system import InventoryMangement
+from qr_code_handle import QrCodeGenerator
 
 
 class LoginPage:
@@ -53,6 +53,7 @@ class LoginPage:
                     retrive_button,
                     lower_frame,
                     lower_left,
+                    login_frame,
                 ),
                 width=10,
                 height=1,
