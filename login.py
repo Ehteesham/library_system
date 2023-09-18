@@ -5,6 +5,7 @@ from tkinter import font
 import numpy as np
 import pandas as pd
 
+from qr_code_handle import QrCodeGenerator
 from inventory_management_system import InventoryMangement
 
 
@@ -14,6 +15,7 @@ class LoginPage:
         self.parent_root = root
         self.invn = InventoryMangement(self.parent_root, book_list_frame)
         self.user_info_path = "Data/user_info.csv"
+        self.qr = QrCodeGenerator()
 
     def detail_check(
         self,
@@ -84,14 +86,7 @@ class LoginPage:
             search_button.grid(row=0, column=1, padx=5, pady=5)
 
             self.clear_frame(login_frame)
-
-            login_label = tk.Label(
-                login_frame,
-                text="Hello",
-                width=28,
-                height=2,
-            )
-            login_label.pack()
+            self.qr.display_qr(login_frame)
 
         else:
             result_label.config(text="Login Failed")
