@@ -1,18 +1,13 @@
 import tkinter as tk
 
-from inventory_management_system import InventoryMangement
-from login import LoginPage
+from tools.login import LoginPage
 
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Initializing an object
     root = tk.Tk()
 
-    # Adjusting tkinter window
+    # tkinter window
     root.title("Library Management System")
-
 
     # Top Left Frame
     book_list_frame = tk.Frame(root, width=970, height=350, bg="white")
@@ -27,13 +22,12 @@ if __name__ == '__main__':
     lower_left.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
     lower_left.pack_propagate(False)
 
-
     # Bottom Right Box
     lower_right = tk.Frame(root, width=200, height=200, bg="white")
     lower_right.grid(row=1, column=1, columnspan=2, padx=5, pady=5, sticky="nsew")
 
     # Top Right Buttons
-    lg = LoginPage(root, book_list_frame)
+    lg = LoginPage(root, book_list_frame, login_frame, lower_right, lower_left)
 
     # Login Button
     login_button = tk.Button(
@@ -41,7 +35,7 @@ if __name__ == '__main__':
         width=28,
         height=2,
         text="Login",
-        command=lambda: lg.login_(login_frame, lower_right, lower_left),
+        command=lg.login_,
     )
     login_button.pack(padx=2, pady=5, anchor="center")
 
@@ -51,7 +45,7 @@ if __name__ == '__main__':
         width=28,
         height=2,
         text="Register",
-        command=lambda: lg.user_registration(login_frame),
+        command=lg.user_registration,
     )
     registration_button.pack(pady=5, anchor="center")
 

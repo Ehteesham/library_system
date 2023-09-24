@@ -68,6 +68,15 @@ class SearchSystem:
 
     def view(self):
         self.root = tk.Toplevel(self.parent_root)
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        # Calculate the X and Y coordinates for the centered window
+        x = (screen_width - 200) // 2
+        y = (screen_height - 80) // 2
+
+        # Set the window geometry
+        self.root.geometry(f"{200}x{80}+{x}+{y}")
         label2 = tk.Label(self.root, text="Enter Book Name")
         label2.pack()
 
@@ -80,5 +89,7 @@ class SearchSystem:
             command=lambda: self.pre_processing(entry2),
             width=10,
             height=1,
+            padx=5,
+            pady=5
         )
-        search_button.pack()
+        search_button.pack(padx=5, pady=5)

@@ -1,27 +1,31 @@
 import os
 import tkinter as tk
-import webbrowser
 from datetime import datetime
 from tkinter import font, ttk
 
 import numpy as np
 import pandas as pd
 
-from qr_code_handle import QrCodeGenerator
-from search_system import SearchSystem
+from tools.qr_code_handle import QrCodeGenerator
+from tools.search_system import SearchSystem
 
 
 class InventoryMangement:
-    def __init__(self, root, book_list_frame):
+    def __init__(self, root, book_list_frame, login_frame, lower_right, lower_left):
         self.parent_root = root
-        self.book_info = None
-        self.book_info_dir = "Data/books_manegment.csv"
-        self.book_info_df = None
-        self.columns = ("Book Name", "Description", "Authors", "Genres", "Date", "Link")
+        self.upper_left = book_list_frame
+        self.login_frame = login_frame
+        self.lower_right = lower_right
+        self.lower_left = lower_left
+        self.qr = QrCodeGenerator(login_frame)
+        self.book_info_dir = "D:/CodeClause/Library Management System/Data/books_manegment.csv"
+        self.columns = ("Book Name", "Description",
+                        "Authors", "Genres", "Date")
         self.book_tree = ttk.Treeview(
-            book_list_frame, columns=self.columns, show="headings", height=17
+            self.upper_left, columns=self.columns, show="headings", height=17
         )
-        self.qr = QrCodeGenerator()
+        self.book_info_df = None
+        self.book_info = None
 
     def add_book(self):
         def register_text():
@@ -31,20 +35,19 @@ class InventoryMangement:
             entered_text3 = entry3.get()
             entered_text4 = entry4.get()
             date = datetime.now().strftime("%Y %m %d")
-            time = datetime.now().strftime("%I:%M:%S %p")
             self.book_info = {
                 "Book Name": entered_text1,
                 "Description": entered_text3,
                 "Author Name": entered_text2,
                 "Genre": selected_option,
                 "Link": entered_text4,
-                "Date": date,
-                "Time": time,
+                "Date": date
             }
             self.book_info_df = pd.DataFrame([self.book_info])
             if os.path.isfile(self.book_info_dir):
                 saved_df = pd.read_csv(self.book_info_dir)
-                merged_df = pd.concat([saved_df, self.book_info_df], ignore_index=True)
+                merged_df = pd.concat(
+                    [saved_df, self.book_info_df], ignore_index=True)
                 merged_df.to_csv(self.book_info_dir, index=False)
             else:
                 self.book_info_df.to_csv(self.book_info_dir, index=False)
@@ -85,53 +88,49 @@ class InventoryMangement:
         option_menu = tk.OptionMenu(self.root, option_var, *options)
         option_menu.pack()
 
-        print_button = tk.Button(self.root, text="Submit", command=register_text)
+        print_button = tk.Button(
+            self.root, text="Submit", command=register_text)
         print_button.pack()
 
         self.root.mainloop()
 
     def search(self):
-        # Assuming you have a Treeview widget named 'book_tree'
-
         sc = SearchSystem(self.parent_root, self.book_tree, self.columns)
         sc.view()
 
-    def retrieve_books(self, retrive_button, lower_frame, lower_left, login_frame):
-        def open_link(event):
-            item = self.book_tree.selection()[0]
-            link = self.book_tree.item(item, "values")[5]
-            if link.startswith("https://") or link.startswith("http://"):
-                webbrowser.open(link)
-
+    def retrieve_books(self, retrive_button, Username):
         def limit_text(text, max_chars):
             if len(text) > max_chars:
                 return text[:max_chars]
             else:
                 return text
 
-        def qrcodehandler(link):
-            df = pd.read_csv(self.book_info_dir, sep=",")
-            qr_code = df[df["Link"] == link].iloc[:, -1].values[0]
-            code = tk.BitmapImage(data=qr_code)
-            return code
-
         def clear_frame(frame):
             for widget in frame.winfo_children():
                 widget.destroy()
 
+        def qr1(book_name):
+            book_df = book_df = pd.read_csv(self.book_info_dir, sep=",")
+            user_report = book_df[book_df['Book Name'] == book_name]
+            self.qr.getqr(book_df, book_name)
+
         def view_details(text, bold_font):
-            clear_frame(login_frame)
+            clear_frame(self.login_frame)
 
             text.config(state="normal")
+
+            text.delete(1.0, "end")
+
+            text.tag_configure("bold", font=bold_font)
             name_item = self.book_tree.selection()[0]
             name_value = self.book_tree.item(name_item, "values")[0]
-            text.delete(1.0, "end")
-            text.tag_configure("bold", font=bold_font)
+
             text.insert("1.0", "Book Name - ", "bold")
             text.insert("1.13", f"{name_value}\n", "normal")
 
             description_item = self.book_tree.selection()[0]
-            description_value = self.book_tree.item(description_item, "values")[1]
+            description_value = self.book_tree.item(
+                description_item, "values")[1]
             limited_text = limit_text(description_value, 850)
             text.insert("2.0", "Description - ", "bold")
             text.insert("2.15", f"{description_value}\n", "normal")
@@ -151,31 +150,43 @@ class InventoryMangement:
             text.insert("5.0", "Published Date - ", "bold")
             text.insert("5.17", f"{date_value}\n", "normal")
 
-            link_item = self.book_tree.selection()[0]
-            link_value = self.book_tree.item(link_item, "values")[5]
-            text.insert("6.0", "Link - ", "bold")
-            text.insert("6.8", f"{link_value}\n", "normal")
-
             text.config(state="disabled")
-            code = qrcodehandler(link_value)
-            custom_font = font.Font(family="Arial", size=14, weight="bold")
-            img_text_label = tk.Label(
-                login_frame,
-                text="Scan To Get Book",
-                wraplength=200,
-                font=custom_font,
-                bg="white",
+
+            self.purchase_button = tk.Button(
+                self.lower_right,
+                text="Get Book",
+                width=10,
+                height=1,
+                padx=5,
+                pady=5,
+                command=lambda: qr1(name_value),
             )
-            img_text_label.pack()
-            img_label = tk.Label(login_frame, image=code, bg="white")
-            img_label.pack()
-            login_frame.mainloop()
+            self.purchase_button.grid(row=2, column=1, padx=5, pady=5)
 
         def update_book_list(tx=None, states=False):
             if states == True:
+                for column_id in self.book_tree.get_children():
+                    self.book_tree.delete(column_id)
+                self.book_tree["columns"] = (
+                    "Book Name",
+                    "Description",
+                    "Author",
+                    "Genres",
+                    "Date"
+                )
+                self.book_tree.heading("#1", text="Book Name")
+                self.book_tree.column("#1")
+                self.book_tree.heading("#2", text="Description")
+                self.book_tree.column("#2")
+                self.book_tree.heading("#3", text="Author")
+                self.book_tree.column("#3")
+                self.book_tree.heading("#4", text="Genres")
+                self.book_tree.column("#4")
+                self.book_tree.heading("#5", text="Date")
+                self.book_tree.column("#5")
+
                 tx.config(state="normal")
                 tx.delete("1.0", "end")
-                self.book_tree.delete(*self.book_tree.get_children())
                 book_df = pd.read_csv(self.book_info_dir, sep=",")
                 ls = []
                 for rows in range(book_df.shape[0]):
@@ -183,7 +194,7 @@ class InventoryMangement:
 
                 for book in ls:
                     self.book_tree.insert("", "end", values=book)
-                self.qr.display_qr(login_frame, state=True)
+                self.qr.display_qr(state=True)
             else:
                 # self.book_tree.delete(*self.book_tree.get_children())
                 book_df = pd.read_csv(self.book_info_dir, sep=",")
@@ -194,22 +205,23 @@ class InventoryMangement:
                 for book in ls:
                     self.book_tree.insert("", "end", values=book)
 
-        text = tk.Text(lower_left, wrap="word", bg="white", font=("Arial", 12))
+        text = tk.Text(self.lower_left, wrap="word",
+                       bg="white", font=("Arial", 12))
         text.pack(fill="both", expand=True)
 
         bold_font = font.Font(text, text.cget("font"))
         bold_font.configure(weight="bold")
-        self.book_tree.bind("<Double-1>", open_link)
         self.book_tree.bind(
             "<ButtonRelease-1>",
-            lambda event, text=text, bold_font=bold_font: view_details(text, bold_font),
+            lambda event, text=text, bold_font=bold_font: view_details(
+                text, bold_font),
         )
         for col in self.columns:
             self.book_tree.heading(col, text=col)
-            if col == "Book Name" or col == "Link" or col == "Description":
-                self.book_tree.column(col, width=210)
+            if col == "Book Name" or col == "Description":
+                self.book_tree.column(col, width=305)
             else:
-                self.book_tree.column(col, width=113)
+                self.book_tree.column(col, width=120)
         self.book_tree.pack(fill="both", expand=True)
         update_book_list()
         retrive_button.config(
